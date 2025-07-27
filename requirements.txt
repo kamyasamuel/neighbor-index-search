@@ -1,3 +1,5 @@
 chromadb
 ollama
 numpy
+fastapi
+uvicorn
