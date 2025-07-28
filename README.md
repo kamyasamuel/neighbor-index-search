@@ -14,7 +14,11 @@ A Python project for building a ChromaDB-like index that retrieves a search hit 
    pip install -r requirements.txt
    ```
 2. Start Ollama and ensure the embedding model is available (e.g., `all-minilm:latest`).
-
+   ```bash
+   On Linux:
+   curl -fsSL https://ollama.com/install.sh | sh
+   ollama pull all-minilm
+   ```
 3. Run the indexing and search script:
    ```bash
    python -m neighbor_index_search.cli --help
@@ -31,7 +35,7 @@ bash start_api.sh
 ```bash
 curl -X POST "http://localhost:8000/add" \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: 8e2b7c1a-2f4e-4b7a-9c3d-1a5e2f7b9c8d" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -d '{"id": "doc1", "text": "This is a test document."}'
 ```
 
@@ -39,7 +43,7 @@ curl -X POST "http://localhost:8000/add" \
 ```bash
 curl -X POST "http://localhost:8000/add-batch" \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: 8e2b7c1a-2f4e-4b7a-9c3d-1a5e2f7b9c8d" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -d '{"ids": ["doc2", "doc3"], "texts": ["Text for doc2", "Text for doc3"]}'
 ```
 
@@ -47,13 +51,48 @@ curl -X POST "http://localhost:8000/add-batch" \
 ```bash
 curl -X POST "http://localhost:8000/search" \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: 8e2b7c1a-2f4e-4b7a-9c3d-1a5e2f7b9c8d" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -d '{"query": "test", "top_k": 1, "context_window": 5}'
 ```
+
+### Generate API Key for a User and Collection
+```bash
+curl -X POST "http://localhost:8000/generate-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"user": "alice", "collection": "alice_collection"}'
+```
+
+The response will include an `api_key` and the associated `collection`. Use this API key in the `X-API-Key` header for all other requests.
 
 ### Health check
 ```bash
 curl http://localhost:8000/health
+```
+
+### Upload a document or zip file
+```bash
+curl -X POST "http://localhost:8000/upload" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -F "user=alice" \
+  -F "collection=alice_collection" \
+  -F "file=@/path/to/your/document.pdf"
+```
+
+You can also upload a zip file containing multiple documents:
+```bash
+curl -X POST "http://localhost:8000/upload" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -F "user=alice" \
+  -F "collection=alice_collection" \
+  -F "file=@/path/to/your/documents.zip"
+```
+
+### Index all uploaded files for a user/collection
+```bash
+curl -X POST "http://localhost:8000/index-uploads" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -F "user=alice" \
+  -F "collection=alice_collection"
 ```
 
 ## License
